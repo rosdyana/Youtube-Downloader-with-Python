@@ -27,16 +27,18 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--input', nargs='+',
-                        help='a csv file of stock data', required=True)
-    parser.add_argument('-1', '--quality',
+                        help='youtube id', required=True)
+    parser.add_argument('-q', '--quality',
                         help='quality level', default='worst')
     parser.add_argument('-f', '--format',
                         help='a format output', default='mpg')
+    parser.add_argument('-c', '--convert',
+                        help='force convert', default=True)
     args = parser.parse_args()
-    ytdl(args.input, args.quality, args.format)
+    ytdl(args.input, args.quality, args.format, args.convert)
 
 
-def ytdl(_input, _quality, _format):
+def ytdl(_input, _quality, _format,_convert):
     ydl_opts = {
         'format': _quality,
         'logger': MyLogger(),
@@ -53,33 +55,38 @@ def ytdl(_input, _quality, _format):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download(video_list)
 
-    sourcedir = os.getcwd()
+    if _convert:
+        sourcedir = os.getcwd()
 
-    if not os.path.exists("{}/videos".format(sourcedir)):
-        os.makedirs("{}/videos".format(sourcedir))
-
-    for file in os.listdir(sourcedir):
-        if file.endswith(".3gp"):
-            filename = file.split('.')
-            length = len(filename)
-            ekst = filename[length - 1]
-            newname = ""
-            for i in range(0, length - 1):
-                filename[i] = re.sub(r'[^\w\s]', '', filename[i])
-                filename[i] = re.sub(r"\s+", '-', filename[i])
-                newname += filename[i]
-            os.rename("{}/{}".format(sourcedir, file),
-                      "{}/{}.{}".format(sourcedir, newname, ekst))
-            print("now converting . . .")
-            inputFile = "{}/{}.{}".format(sourcedir, newname, ekst)
-            outputFile = "{}/{}.{}".format(sourcedir, newname, _format)
-            # subprocess.call(["ffmpeg", "-i", inputFile, outputFile])
-            ff = ffmpy.FFmpeg(inputs={inputFile: None},
-                              outputs={outputFile: None})
-            ff.run()
-            os.remove(inputFile)
-            os.rename(outputFile, "{}/videos/{}".format(sourcedir,outputFile))
-            print("done")
+        if not os.path.exists("{}/videos".format(sourcedir)):
+            os.makedirs("{}/videos".format(sourcedir))
+        filext = ""
+        if _quality == 'worst':
+            filext = "3gp"
+        if _quality == 'best':
+            filext = "mp4"
+        for file in os.listdir(sourcedir):
+            if file.endswith(".{}".format(filext)):
+                filename = file.split('.')
+                length = len(filename)
+                ekst = filename[length - 1]
+                newname = ""
+                for i in range(0, length - 1):
+                    filename[i] = re.sub(r'[^\w\s]', '', filename[i])
+                    filename[i] = re.sub(r"\s+", '-', filename[i])
+                    newname += filename[i]
+                os.rename("{}/{}".format(sourcedir, file),
+                          "{}/{}.{}".format(sourcedir, newname, ekst))
+                print("now converting . . .")
+                inputFile = "{}/{}.{}".format(sourcedir, newname, ekst)
+                outputFile = "{}/{}.{}".format(sourcedir, newname, _format)
+                # subprocess.call(["ffmpeg", "-i", inputFile, outputFile])
+                ff = ffmpy.FFmpeg(inputs={inputFile: None},
+                                  outputs={outputFile: '-c:a copy'})
+                ff.run()
+                # os.remove(inputFile)
+                os.rename(outputFile, "{}/videos/{}".format(sourcedir, outputFile))
+                print("done")
 
 
 if __name__ == '__main__':

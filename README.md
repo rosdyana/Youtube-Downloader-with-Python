@@ -9,16 +9,19 @@ pip install -r requirements.txt
 ```
 ## Usage
 ```bash
-usage: ytdl.py [-h] -i INPUT [INPUT ...] [-1 QUALITY] [-f FORMAT]
+usage: ytdl.py [-h] -i INPUT [INPUT ...] [-q QUALITY] [-f FORMAT] [-c CONVERT]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT [INPUT ...], --input INPUT [INPUT ...]
-                        a csv file of stock data (default: None)
-  -1 QUALITY, --quality QUALITY
+                        youtube id (default: None)
+  -q QUALITY, --quality QUALITY
                         quality level (default: worst)
   -f FORMAT, --format FORMAT
                         a format output (default: mpg)
+  -c CONVERT, --convert CONVERT
+                        force convert (default: True)
+
 
 ```
 
