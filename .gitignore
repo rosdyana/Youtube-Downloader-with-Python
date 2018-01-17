@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# custom
+.mpg
+.mp3
+.avi
+.3gp
+.flv
+.mp4

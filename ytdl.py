@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 import youtube_dl
 import os
-import subprocess
+# import subprocess
 import re
 import argparse
+import ffmpy
 
 
 class MyLogger(object):
@@ -25,7 +26,7 @@ def my_hook(d):
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-i', '--input',nargs='+',
+    parser.add_argument('-i', '--input', nargs='+',
                         help='a csv file of stock data', required=True)
     parser.add_argument('-1', '--quality',
                         help='quality level', default='worst')
@@ -35,7 +36,7 @@ def main():
     ytdl(args.input, args.quality, args.format)
 
 
-def ytdl(_input,_quality,_format):
+def ytdl(_input, _quality, _format):
     ydl_opts = {
         'format': _quality,
         'logger': MyLogger(),
@@ -54,11 +55,14 @@ def ytdl(_input,_quality,_format):
 
     sourcedir = os.getcwd()
 
+    if not os.path.exists("{}/videos".format(sourcedir)):
+        os.makedirs("{}/videos".format(sourcedir))
+
     for file in os.listdir(sourcedir):
         if file.endswith(".3gp"):
             filename = file.split('.')
             length = len(filename)
-            ekst = filename[length-1]
+            ekst = filename[length - 1]
             newname = ""
             for i in range(0, length - 1):
                 filename[i] = re.sub(r'[^\w\s]', '', filename[i])
@@ -67,9 +71,14 @@ def ytdl(_input,_quality,_format):
             os.rename("{}/{}".format(sourcedir, file),
                       "{}/{}.{}".format(sourcedir, newname, ekst))
             print("now converting . . .")
-            subprocess.call(["ffmpeg", "-i", sourcedir + "/" +
-                             newname + ".{}".format(ekst), sourcedir + "/" + newname + ".{}".format(_format)])
-            os.remove("{}/{}.{}".format(sourcedir, newname, ekst))
+            inputFile = "{}/{}.{}".format(sourcedir, newname, ekst)
+            outputFile = "{}/{}.{}".format(sourcedir, newname, _format)
+            # subprocess.call(["ffmpeg", "-i", inputFile, outputFile])
+            ff = ffmpy.FFmpeg(inputs={inputFile: None},
+                              outputs={outputFile: None})
+            ff.run()
+            os.remove(inputFile)
+            os.rename(outputFile, "{}/videos/{}".format(sourcedir,outputFile))
             print("done")
 
 
