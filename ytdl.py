@@ -85,7 +85,7 @@ def ytdl(_input, _quality, _format,_convert):
                                   outputs={outputFile: '-c:a copy'})
                 ff.run()
                 # os.remove(inputFile)
-                os.rename(outputFile, "{}/videos/{}".format(sourcedir, outputFile))
+                os.rename(outputFile, "{}/videos/{}.{}".format(sourcedir, newname, _format))
                 print("done")
 
 
