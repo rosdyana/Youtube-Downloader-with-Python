@@ -23,4 +23,7 @@ optional arguments:
 ```
 
 ## Credit
-thanks to youtube-dl (https://github.com/rg3/youtube-dl)
+thanks to :
+- youtube-dl (https://github.com/rg3/youtube-dl)
+- ffmpy (https://github.com/Ch00k/ffmpy)
+
